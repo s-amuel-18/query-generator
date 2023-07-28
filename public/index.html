@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="google-signin-client_id"
+        content="936238925835-dtucb6e0fd53eojfn7tcia0h92tn59jj.apps.googleusercontent.com"> -->
+
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Google sign in </h1>
+
+    <div id="g_id_onload" data-client_id="936238925835-dtucb6e0fd53eojfn7tcia0h92tn59jj.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse" data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with"
+        data-shape="rectangular" data-logo_alignment="left">
+    </div>
+
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+
+
+    <script>
+        function handleCredentialResponse(response) {
+            // decodeJwtResponse() is a custom function defined by you
+            // to decode the credential response.
+            // const responsePayload = decodeJwtResponse(response.credential);
+            // console.log(response.credential);
+            fetch("http://localhost:8080/api/auth/google-login", {
+                method: "POST",
+                body: JSON.stringify({ google_id: response.credential }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(resp => resp.json())
+                .then(resp => console.log(resp))
+                .catch(err => console.log(err))
+
+            // console.log("ID: " + responsePayload.sub);
+            // console.log('Full Name: ' + responsePayload.name);
+            // console.log('Given Name: ' + responsePayload.given_name);
+            // console.log('Family Name: ' + responsePayload.family_name);
+            // console.log("Image URL: " + responsePayload.picture);
+            // console.log("Email: " + responsePayload.email);
+        }
+    </script>
+</body>
+
+</html>

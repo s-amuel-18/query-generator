@@ -1,0 +1,37 @@
+{
+    "info_atleta": {
+        "name": "search",
+        "lastname": "search",
+        "genero": "is",
+        "lugar_nacimiento": "is",
+        "telefono": "is",
+        "actividad_deportiva": "is",
+        "disciplina": "is",
+        "cetegoria": "is",
+        "nivel": "is",
+        "altura": {
+            "from": "desde",
+            "to": "hasta"
+        },
+        "peso": {
+            "from": "desde",
+            "to": "hasta"
+        },
+        "direccion_vivienda": "search",
+        "age": {
+            "from": "desde",
+            "to": "hasta"
+        }
+    },
+    "indumentaria": {
+        "talla_franela": "is",
+        "talla_zapatos": "is",
+        "talla_pantalon": "is"
+    },
+    "documentacion": {
+        "cedula": "is",
+        "cedula_vigente": "boolean",
+        "pasaporte": "is",
+        "pasaporte_vigente": "boolean"
+    }
+}
