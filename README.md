@@ -40,7 +40,7 @@ El nombre de los campos debe ser el mismo que fue definido en el modelo y a cada
 
 ### Estructura del objeto principal
 
-```
+```javascript
 {
     field1: typeOperator,
     field2: typeOperator,
@@ -50,7 +50,7 @@ El nombre de los campos debe ser el mismo que fue definido en el modelo y a cada
 
 ### Estructura de los modelos asociados
 
-```
+```javascript
 {
     FIELDS...,
     assosiations: {
@@ -70,7 +70,7 @@ Los parametros que deben llegar a la ruta `api/users` deben venir de la misma fo
 
 **Objeto de configuración**
 
-```
+```javascript
 Para modelo usuario
 {
     name: operatorTypes.string,
