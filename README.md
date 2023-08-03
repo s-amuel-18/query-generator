@@ -44,7 +44,7 @@ El nombre de los campos debe ser el mismo que fue definido en el modelo y a cada
 {
     field1: typeOperator,
     field2: typeOperator,
-    ...
+    // ...
 }
 ```
 
@@ -52,11 +52,15 @@ El nombre de los campos debe ser el mismo que fue definido en el modelo y a cada
 
 ```javascript
 {
-    FIELDS...,
+    field: typeOperator,
+    // FIELDS...,
     assosiations: {
         NAME_ASSOSIATION: {
             model: MODEL_ASSOSIATION,
-            attributes: {FIELDS_MODEL_ASSOSIATIONS...}
+            attributes: {
+                FIELD_MODEL_ASSOSIATIONS: typeOperator
+                // ...
+            }
         }
     }
 }
@@ -71,7 +75,7 @@ Los parametros que deben llegar a la ruta `api/users` deben venir de la misma fo
 **Objeto de configuración**
 
 ```javascript
-Para modelo usuario
+// Para modelo usuario
 {
     name: operatorTypes.string,
     email: operatorTypes.string,
