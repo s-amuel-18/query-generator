@@ -7,32 +7,21 @@ import {
   objUserDataToFilter,
 } from "../helpers/dataTransferParser.js";
 import { Event } from "../models/Event.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { ClotheSizeUser } from "../models/ClotheSizeUser.js";
+import { QueryBuilder } from "../helpers/queryBuilder.js";
+import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
 
 export const getUsers = async (req, res) => {
-  //   console.log(req.query);
-  //   return res.json(req.query);
-  const objQuery = dataToFilter(req.query, objUserDataToFilter);
-  //   console.log("objQuery", objQuery);
-  const users = await User.findAndCountAll({ ...objQuery, distinct: true });
-  //   const users = await User.findAndCountAll({
-  //     include: [
-  //       {
-  //         model: Event,
-  //         where: { start_date: { [Op.and]: { [Op.lte]: "2018-03-02" } } },
-  //       },
-  //     ],
-  //     distinct: true,
-  //   });
-  //   const users = await User.findAndCountAll({
-  //     include: [
-  //       {
-  //         model: Project,
-  //       },
-  //     ],
-  //     distinct: true,
-  //   });
+  const querySelquelize = userQueryBuilder.transformRequestIntoQuery(req.query);
+
+  const users = await User.findAndCountAll({
+    ...querySelquelize,
+    distinct: true,
+  });
+  // const users = await User.findAll({
+  //   include: [{ model: Project, attributes: ["id"] }],
+  // });
 
   return res.json({
     users,

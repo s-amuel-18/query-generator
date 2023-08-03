@@ -74,18 +74,12 @@ export const objUserDataToFilter = {
   name: operatorTypes.string,
   email: operatorTypes.string,
   active: { is },
-  /*
-   * Objeto de relaciones, este objeto contiene las relaciones de la tabla a consultar, en este caso Users.
-   * Para que el query builder funcione correctamente se deben pasar como primera llave el nombre de la relacion Su contenido debe mantener la estructura planteada. ejem:
-   * { RELATION: { model: {...}, attributes: {...} } }
-   * model: Debe contener la instacia del modelo relacionado.
-   * attribute: Debe contener los nombres de los campos de la tabla relacionada, IMPORTANTE: los campos deben ser los mismos que fueron definidos en el modelo. A cada campo se le debe asignar un tipo de dato que se optiene del objeto ``operatorTypes`` de esta forma le podemos asegurar una correcta busqueda a la hora de hacer la consulta, tambien limitamos al cliente que no puede pasar cualquier operador logico, unicamente los que estan definidos en el "tipo de operador".
-   */
   assosiations: {
+    // * Modelos relacionados al modelo principal
     project: {
-      model: Project,
+      model: Project, // * Obligatorio para la consulta
       attributes: {
-        name: operatorTypes.string,
+        name: operatorTypes.string, // * Debe ser el mismo que se definió en el modelo
         description: operatorTypes.string,
         createdAt: operatorTypes.date,
       },
@@ -151,7 +145,7 @@ const fromParamsWithOperatorsToQuery = (paramsToFilter, assosiationFields) => {
 };
 
 // * Retorna un objeto de consulta a los modelos relacionados con el modelo principal.
-export const parserAssosiations = (queryParams = null, objRelations = null) => {
+const parserAssosiations = (queryParams = null, objRelations = null) => {
   if (!queryParams || !objRelations)
     throw new Error(
       "Error, se deben pasar  los parametros obligatoriamente en la funcion 'parserAssosiations'"

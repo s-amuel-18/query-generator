@@ -10,11 +10,9 @@ export const User = sequelize.define("users", {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    // field: "id",
   },
   name: {
     type: DataTypes.STRING,
-    // field: "name_field",
   },
   email: {
     type: DataTypes.STRING,
@@ -33,9 +31,9 @@ export const User = sequelize.define("users", {
   },
 });
 
-// * ======================================================
-// * =================RELACIONES===========================
-// * ======================================================
+// * ============================================
+// * =================RELACIONES=================
+// * ============================================
 User.hasMany(Project, {
   foreignKey: "user_id",
   sourceKey: "id",
