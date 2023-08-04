@@ -1,28 +1,20 @@
-import { validationResult } from "express-validator";
 import { Project } from "../models/Project.js";
 import { User } from "../models/User.js";
 import bcryptjs from "bcryptjs";
-import {
-  dataToFilter,
-  objUserDataToFilter,
-} from "../helpers/dataTransferParser.js";
-import { Event } from "../models/Event.js";
-import { Op, Sequelize } from "sequelize";
-import { ClotheSizeUser } from "../models/ClotheSizeUser.js";
-import { QueryBuilder } from "../helpers/queryBuilder.js";
 import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
+import validator from "validator";
 
 export const getUsers = async (req, res) => {
+  const str = "";
+
+  console.log(validator.isEmpty(str));
+
   const querySelquelize = userQueryBuilder.transformRequestIntoQuery(req.query);
 
   const users = await User.findAndCountAll({
     ...querySelquelize,
     distinct: true,
   });
-  // const users = await User.findAll({
-  //   include: [{ model: Project, attributes: ["id"] }],
-  // });
-
   return res.json({
     users,
   });

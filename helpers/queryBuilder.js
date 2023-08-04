@@ -76,13 +76,12 @@ export class QueryBuilder {
         const fieldType = fieldsWithOperators[fieldToFilter];
         const operatorsWithFilterValue = paramsToFilter[fieldToFilter];
 
-        // todo: Se debe renombrar esta variable de forma que sea mas explisita.
         const arrquery = Object.keys(operatorsWithFilterValue)
           .filter((operator) => Object.hasOwnProperty.call(fieldType, operator))
           .map((operator) => {
             const valueOperator = operatorsWithFilterValue[operator];
-            const fnToOperator = fieldType[operator];
-            return fnToOperator(valueOperator);
+            const operatorFn = fieldType[operator];
+            return operatorFn(valueOperator);
           });
 
         if (arrquery.length === 0) return null;

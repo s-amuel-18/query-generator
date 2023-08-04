@@ -5,50 +5,50 @@ import { Project } from "../../models/Project.js";
 import {
   QueryBuilder,
   logicalOperators,
-  operatorTypes,
+  operatorTypes as ot,
 } from "../queryBuilder.js";
 
 export const userQueryBuilder = new QueryBuilder({
-  id: operatorTypes.identifier,
-  name: operatorTypes.string,
-  email: operatorTypes.string,
+  id: ot.identifier,
+  name: ot.string,
+  email: ot.string,
   active: { is: logicalOperators.is },
   assosiations: {
     // * Modelos relacionados al modelo principal
     project: {
       model: Project, // * Obligatorio para la consulta
       attributes: {
-        name: operatorTypes.string, // * Debe ser el mismo que se definió en el modelo
-        description: operatorTypes.string,
-        createdAt: operatorTypes.date,
+        name: ot.string, // * Debe ser el mismo que se definió en el modelo
+        description: ot.string,
+        createdAt: ot.date,
       },
     },
     event: {
       model: Event,
       attributes: {
-        id: operatorTypes.identifier,
-        name: operatorTypes.string,
-        start_date: operatorTypes.date,
-        end_date: operatorTypes.date,
+        id: ot.identifier,
+        name: ot.string,
+        start_date: ot.date,
+        end_date: ot.date,
       },
     },
     clothe_size: {
       model: ClotheSizeUser,
       attributes: {
-        shirt: operatorTypes.string,
-        pants: operatorTypes.string,
-        jacket: operatorTypes.string,
-        shoes: operatorTypes.string,
+        shirt: ot.string,
+        pants: ot.string,
+        jacket: ot.string,
+        shoes: ot.string,
       },
     },
     personal_info: {
       model: PersonalInfo,
       attributes: {
-        identification_number: operatorTypes.string,
-        passport_number: operatorTypes.string,
-        passport_issuance_date: operatorTypes.string,
-        passport_expiration_date: operatorTypes.string,
-        birthdate: operatorTypes.string,
+        identification_number: ot.string,
+        passport_number: ot.string,
+        passport_issuance_date: ot.string,
+        passport_expiration_date: ot.string,
+        birthdate: ot.string,
       },
     },
   },
