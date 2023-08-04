@@ -5,12 +5,14 @@ import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
 import validator from "validator";
 
 export const getUsers = async (req, res) => {
-  const str = "";
+  let querySelquelize;
 
-  console.log(validator.isEmpty(str));
-
-  const querySelquelize = userQueryBuilder.transformRequestIntoQuery(req.query);
-
+  try {
+    querySelquelize = userQueryBuilder.transformRequestIntoQuery(req.query);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
   const users = await User.findAndCountAll({
     ...querySelquelize,
     distinct: true,

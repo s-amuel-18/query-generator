@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import v from "validator";
 
 export const logicalOperators = {
   contains: (value) => ({ [Op.like]: `%${value}%` }),
@@ -26,36 +27,57 @@ const {
   less_than_or_equal,
 } = logicalOperators;
 
+const notIsEmpty = (value) => typeof value === "string" && !v.isEmpty(value);
+
+const arrStringValidation = [notIsEmpty];
+const arrNumberValidation = [notIsEmpty, v.isNumeric];
+const arrDateValidation = [notIsEmpty, v.isISO8601];
+
 export const operatorTypes = {
   string: {
-    begins_with,
-    contains,
-    ends_with,
-    is,
-    is_not,
-    not_contains,
+    validation: arrStringValidation,
+    operators: {
+      begins_with,
+      contains,
+      ends_with,
+      is,
+      is_not,
+      not_contains,
+    },
   },
   number: {
-    is,
-    is_not,
-    less_than,
-    less_than_or_equal,
-    more_than,
-    more_than_or_equal,
+    validation: arrNumberValidation,
+    operators: {
+      is,
+      is_not,
+      less_than,
+      less_than_or_equal,
+      more_than,
+      more_than_or_equal,
+    },
   },
   date: {
-    is,
-    is_not,
-    less_than,
-    less_than_or_equal,
-    more_than,
-    more_than_or_equal,
+    validation: arrDateValidation,
+    operators: {
+      is,
+      is_not,
+      less_than,
+      less_than_or_equal,
+      more_than,
+      more_than_or_equal,
+    },
   },
   identifier: {
-    is,
+    validation: arrDateValidation,
+    operators: {
+      is,
+    },
   },
   boolean: {
-    is,
+    validation: [],
+    operators: {
+      is,
+    },
   },
 };
 
@@ -73,7 +95,9 @@ export class QueryBuilder {
           fieldToFilter != "assosiations"
       )
       .forEach((fieldToFilter) => {
-        const fieldType = fieldsWithOperators[fieldToFilter];
+        const type = fieldsWithOperators[fieldToFilter];
+        const fieldType = type.operators;
+
         const operatorsWithFilterValue = paramsToFilter[fieldToFilter];
 
         const arrquery = Object.keys(operatorsWithFilterValue)
@@ -81,6 +105,12 @@ export class QueryBuilder {
           .map((operator) => {
             const valueOperator = operatorsWithFilterValue[operator];
             const operatorFn = fieldType[operator];
+
+            type.validation.forEach((isAFiledValue) => {
+              if (!isAFiledValue(valueOperator))
+                throw new Error(`El campo ${fieldToFilter} es invalido.`);
+            });
+
             return operatorFn(valueOperator);
           });
 
