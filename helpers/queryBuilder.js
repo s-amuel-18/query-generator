@@ -1,3 +1,4 @@
+import { query } from "express-validator";
 import { Op } from "sequelize";
 import v from "validator";
 
@@ -27,15 +28,14 @@ const {
   less_than_or_equal,
 } = logicalOperators;
 
-const notIsEmpty = (value) => typeof value === "string" && !v.isEmpty(value);
-
-const arrStringValidation = [notIsEmpty];
-const arrNumberValidation = [notIsEmpty, v.isNumeric];
-const arrDateValidation = [notIsEmpty, v.isISO8601];
-
 export const operatorTypes = {
   string: {
-    validation: arrStringValidation,
+    expressValidation: {
+      trim: true,
+      optional: true,
+      isString: true,
+      errorMessage: "",
+    },
     operators: {
       begins_with,
       contains,
@@ -46,7 +46,13 @@ export const operatorTypes = {
     },
   },
   number: {
-    validation: arrNumberValidation,
+    expressValidation: {
+      trim: true,
+      optional: true,
+      isNumeric: true,
+      toInt: true,
+      errorMessage: "",
+    },
     operators: {
       is,
       is_not,
@@ -57,7 +63,12 @@ export const operatorTypes = {
     },
   },
   date: {
-    validation: arrDateValidation,
+    expressValidation: {
+      trim: true,
+      optional: true,
+      isDate: true,
+      errorMessage: "",
+    },
     operators: {
       is,
       is_not,
@@ -68,13 +79,25 @@ export const operatorTypes = {
     },
   },
   identifier: {
-    validation: arrDateValidation,
+    expressValidation: {
+      trim: true,
+      optional: true,
+      isNumeric: true,
+      toInt: true,
+      errorMessage: "",
+    },
     operators: {
       is,
     },
   },
   boolean: {
-    validation: [],
+    expressValidation: {
+      trim: true,
+      optional: true,
+      isBoolean: true,
+      toBoolean: true,
+      errorMessage: "",
+    },
     operators: {
       is,
     },
@@ -105,11 +128,6 @@ export class QueryBuilder {
           .map((operator) => {
             const valueOperator = operatorsWithFilterValue[operator];
             const operatorFn = fieldType[operator];
-
-            type.validation.forEach((isAFiledValue) => {
-              if (!isAFiledValue(valueOperator))
-                throw new Error(`El campo ${fieldToFilter} es invalido.`);
-            });
 
             return operatorFn(valueOperator);
           });
@@ -162,4 +180,27 @@ export class QueryBuilder {
 
     return finalQuery;
   };
+
+  createObjFieldValidation(field, paramSchema, assosiations = null) {
+    const fieldType = assosiations
+      ? this.modelFields?.assosiations?.[assosiations]?.attributes?.[field]
+      : this.modelFields?.[field];
+
+    // console.log("fields", fields);
+
+    if (!fieldType) return null;
+
+    // const fieldType = fields[field];
+
+    let objValidator = {};
+
+    Object.keys(fieldType.operators).forEach((operator) => {
+      objValidator = {
+        ...objValidator,
+        [paramSchema + operator]: fieldType.expressValidation,
+      };
+    });
+
+    return objValidator;
+  }
 }

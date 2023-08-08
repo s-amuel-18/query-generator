@@ -12,7 +12,7 @@ export const userQueryBuilder = new QueryBuilder({
   id: ot.identifier,
   name: ot.string,
   email: ot.string,
-  active: { is: logicalOperators.is },
+  active: ot.boolean,
   assosiations: {
     // * Modelos relacionados al modelo principal
     project: {
@@ -32,6 +32,7 @@ export const userQueryBuilder = new QueryBuilder({
         end_date: ot.date,
       },
     },
+
     clothe_size: {
       model: ClotheSizeUser,
       attributes: {
@@ -46,9 +47,9 @@ export const userQueryBuilder = new QueryBuilder({
       attributes: {
         identification_number: ot.string,
         passport_number: ot.string,
-        passport_issuance_date: ot.string,
-        passport_expiration_date: ot.string,
-        birthdate: ot.string,
+        passport_issuance_date: ot.date,
+        passport_expiration_date: ot.date,
+        birthdate: ot.date,
       },
     },
   },

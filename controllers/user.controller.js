@@ -2,24 +2,38 @@ import { Project } from "../models/Project.js";
 import { User } from "../models/User.js";
 import bcryptjs from "bcryptjs";
 import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
-import validator from "validator";
+import { matchedData } from "express-validator";
+import { Sequelize } from "sequelize";
+// import { userValidationSchema } from "../middleware/validations/user.validation.js";
 
 export const getUsers = async (req, res) => {
+  // console.log(userValidationSchema);
+  // console.log("fieldValidators", fieldValidators);
+  // return res.json(req.query);
+  // return res.json(matchedData(req));
   let querySelquelize;
 
+  const requestParams = matchedData(req);
+
   try {
-    querySelquelize = userQueryBuilder.transformRequestIntoQuery(req.query);
+    querySelquelize = userQueryBuilder.transformRequestIntoQuery(requestParams);
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
-  const users = await User.findAndCountAll({
-    ...querySelquelize,
-    distinct: true,
-  });
-  return res.json({
-    users,
-  });
+  // return res.json(querySelquelize);
+  try {
+    const users = await User.findAndCountAll({
+      ...querySelquelize,
+      distinct: true,
+    });
+    return res.json({
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 
 export const createUser = async (req, res) => {
