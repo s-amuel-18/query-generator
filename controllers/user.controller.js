@@ -3,20 +3,16 @@ import { User } from "../models/User.js";
 import bcryptjs from "bcryptjs";
 import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
 import { matchedData } from "express-validator";
-import { Sequelize } from "sequelize";
-import { userQueryBuilderValidation } from "../middleware/validations/user.validation.js";
-// import { userValidationSchema } from "../middleware/validations/user.validation.js";
 
 export const getUsers = async (req, res) => {
   // console.log(userValidationSchema);
   // console.log("fieldValidators", fieldValidators);
   // return res.json(req.query);
-  // return res.json(matchedData(req));
+  return res.json(matchedData(req));
   let querySelquelize;
 
   const requestParams = matchedData(req);
-  console.log("KEYS", Object.keys(userQueryBuilderValidation).length);
-  userQueryBuilder.expressValidationSchema();
+
   try {
     querySelquelize = userQueryBuilder.transformRequestIntoQuery(requestParams);
   } catch (error) {

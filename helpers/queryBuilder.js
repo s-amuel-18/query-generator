@@ -1,6 +1,5 @@
 import { query } from "express-validator";
 import { Op } from "sequelize";
-import v from "validator";
 
 export const logicalOperators = {
   contains: (value) => ({ [Op.like]: `%${value}%` }),
@@ -30,6 +29,7 @@ const {
 
 export const operatorTypes = {
   string: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -46,6 +46,7 @@ export const operatorTypes = {
     },
   },
   number: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -63,6 +64,7 @@ export const operatorTypes = {
     },
   },
   date: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -79,6 +81,7 @@ export const operatorTypes = {
     },
   },
   identifier: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -91,6 +94,7 @@ export const operatorTypes = {
     },
   },
   boolean: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -181,102 +185,33 @@ export class QueryBuilder {
     return finalQuery;
   };
 
-  createObjFieldValidation(field, paramSchema, assosiations = null) {
-    const fieldType = assosiations
-      ? this.modelFields?.assosiations?.[assosiations]?.attributes?.[field]
-      : this.modelFields?.[field];
-
-    if (!fieldType) return null;
-
-    let objValidator = {};
-
-    Object.keys(fieldType.operators).forEach((operator) => {
-      objValidator = {
-        ...objValidator,
-        [paramSchema + operator]: fieldType.expressValidation,
-      };
-    });
-
-    return objValidator;
-  }
-
   expressValidationSchema() {
-    console.log(
-      "REPETIDOS",
-      this.createObjectValidation(this.modelFields, "expressValidation")
-    );
+    return this.createObjectValidation(this.modelFields, "expressValidation");
   }
 
-  // createObjectValidation(objToTraverse) {
-  //   if (typeof objToTraverse !== "object") {
-  //     return {};
-  //   }
-
-  //   let objFinal = {};
-
-  //   for (const [key, value] of Object.entries(objToTraverse)) {
-  //     if (key === "expressValidation") {
-  //       // console.log("Entroo");
-  //       objFinal = {
-  //         ...objFinal,
-  //         [`Obje ${Object.keys(objFinal)}`]: value,
-  //       };
-  //     }
-
-  //     console.log("Casí retorna", key);
-  //     objFinal = { ...this.createObjectValidation(value) };
-  //   }
-  //   return objFinal;
-  // }
-  createObjectValidation(objeto, atributo, count = 1) {
-    // Condición de parada
-    if (typeof objeto !== "object") {
-      return {};
-    }
+  createObjectValidation(obj, attr) {
+    if (typeof obj !== "object") return {};
 
     let acumulado = {};
 
-    for (const [clave, valor] of Object.entries(objeto)) {
-      if (clave === atributo) {
-        acumulado = {
-          ...acumulado,
-          [`Obj ${Object.keys(acumulado).length + 1}`]: valor,
-        };
+    for (const [clave, valor] of Object.entries(obj)) {
+      if (
+        Object.hasOwnProperty.call(obj, attr) &&
+        Object.hasOwnProperty.call(obj, "id") &&
+        Object.hasOwnProperty.call(obj, "operators")
+      ) {
+        Object.keys(obj.operators).forEach((operator) => {
+          acumulado[`${obj.id}.${operator}`] = obj[attr];
+        });
+        break;
       }
 
       acumulado = {
         ...acumulado,
-        ...this.createObjectValidation(valor, atributo, count + 1),
+        ...this.createObjectValidation(valor, attr),
       };
     }
 
     return acumulado;
   }
 }
-function acumularValor(objeto, atributo) {
-  // Condición de parada
-  if (typeof objeto !== "object") {
-    return 0;
-  }
-  // Crear una variable para guardar el valor acumulado
-  let acumulado = 0;
-  // Recorrer las propiedades del objeto
-  for (const [clave, valor] of Object.entries(objeto)) {
-    // Comparar si la clave es igual al atributo buscado
-    if (clave === atributo) {
-      // Sumar el valor al acumulado
-      acumulado += valor;
-    }
-    // Llamada recursiva con el valor de la propiedad
-    acumulado += acumularValor(valor, atributo);
-  }
-  // Retornar el valor acumulado
-  return acumulado;
-}
-
-// // Crear un objeto vacío
-// let objetoAcumulado = {};
-// // Asignar una propiedad con el nombre del atributo y el valor de la función
-// objetoAcumulado["atributo"] = acumularValor(objeto, "atributo");
-// // Mostrar el objeto acumulado
-// console.log(objetoAcumulado);
