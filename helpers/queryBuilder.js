@@ -2,14 +2,17 @@ import { query } from "express-validator";
 import { Op } from "sequelize";
 import validator from "validator";
 import {
-  isString,
   isArray,
   isArrayOrString,
   isArrayOrNumber,
-  isNum,
   isArrayOrDate,
   isArrayOrInt,
 } from "../helpers/validation/funcion.validation.js";
+import {
+  hasPropertyCall,
+  isObject,
+  keys,
+} from "./functions/object.function.js";
 
 export const logicalOperators = {
   contains: (value) => ({ [Op.like]: `%${value}%` }),
@@ -117,20 +120,18 @@ export const operatorTypes = {
   },
 };
 
-export let countExect = 0;
-
 export class QueryBuilder {
   constructor(modelFields) {
     this.modelFields = modelFields;
-    countExect++;
   }
 
   parserFieldsWithOperators = (paramsToFilter, fieldsWithOperators) => {
     let queryWithOperators = {};
-    Object.keys(paramsToFilter)
+
+    keys(paramsToFilter)
       .filter(
         (fieldToFilter) =>
-          Object.hasOwnProperty.call(fieldsWithOperators, fieldToFilter) &&
+          hasPropertyCall(fieldsWithOperators, fieldToFilter) &&
           fieldToFilter != "assosiations"
       )
       .forEach((fieldToFilter) => {
@@ -139,11 +140,12 @@ export class QueryBuilder {
 
         const operatorsWithFilterValue = paramsToFilter[fieldToFilter];
 
-        const arrquery = Object.keys(operatorsWithFilterValue)
-          .filter((operator) => Object.hasOwnProperty.call(fieldType, operator))
+        const arrquery = keys(operatorsWithFilterValue)
+          .filter((operator) => hasPropertyCall(fieldType, operator))
           .map((operator) => {
             const valueOperator = operatorsWithFilterValue[operator];
             const operatorFn = fieldType[operator];
+
             if (isArray(valueOperator))
               return { [Op.or]: valueOperator.map((val) => operatorFn(val)) };
 
@@ -164,8 +166,8 @@ export class QueryBuilder {
   parserAssosiations = (queryParams) => {
     const objRelations = this.modelFields?.assosiations || {};
 
-    const arrModelIncludes = Object.keys(queryParams)
-      .filter((param) => Object.hasOwnProperty.call(objRelations, param))
+    const arrModelIncludes = keys(queryParams)
+      .filter((param) => hasPropertyCall(objRelations, param))
       .map((param) => {
         const fieldsToFilter = queryParams[param];
         const assosiation = objRelations[param];
@@ -204,18 +206,18 @@ export class QueryBuilder {
   }
 
   createCheckSchemaObject(obj) {
-    if (typeof obj !== "object") return {};
+    if (!isObject(obj)) return {};
 
     let acumulado = {};
     const attr = "expressValidation";
 
     for (const [clave, valor] of Object.entries(obj)) {
       if (
-        Object.hasOwnProperty.call(obj, attr) &&
-        Object.hasOwnProperty.call(obj, "id") &&
-        Object.hasOwnProperty.call(obj, "operators")
+        hasPropertyCall(obj, attr) &&
+        hasPropertyCall(obj, "id") &&
+        hasPropertyCall(obj, "operators")
       ) {
-        Object.keys(obj.operators).forEach((operator) => {
+        keys(obj.operators).forEach((operator) => {
           acumulado[`${obj.id}.${operator}`] = obj[attr];
         });
         break;
