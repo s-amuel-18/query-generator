@@ -2,7 +2,7 @@ import { ClotheSizeUser } from "../../models/ClotheSizeUser.js";
 import { Event } from "../../models/Event.js";
 import { PersonalInfo } from "../../models/PersonalInfo.js";
 import { Project } from "../../models/Project.js";
-import { QueryBuilder, operatorTypes as ot } from "../queryBuilder.js";
+import { QueryBuilder, operatorTypes } from "../queryBuilder.js";
 
 const { string, date, identifier, boolean } = operatorTypes;
 
