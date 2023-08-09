@@ -1,6 +1,5 @@
 import { query } from "express-validator";
 import { Op } from "sequelize";
-import v from "validator";
 
 export const logicalOperators = {
   contains: (value) => ({ [Op.like]: `%${value}%` }),
@@ -30,6 +29,7 @@ const {
 
 export const operatorTypes = {
   string: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -46,6 +46,7 @@ export const operatorTypes = {
     },
   },
   number: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -63,6 +64,7 @@ export const operatorTypes = {
     },
   },
   date: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -79,6 +81,7 @@ export const operatorTypes = {
     },
   },
   identifier: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -91,6 +94,7 @@ export const operatorTypes = {
     },
   },
   boolean: {
+    id: null,
     expressValidation: {
       trim: true,
       optional: true,
@@ -181,26 +185,33 @@ export class QueryBuilder {
     return finalQuery;
   };
 
-  createObjFieldValidation(field, paramSchema, assosiations = null) {
-    const fieldType = assosiations
-      ? this.modelFields?.assosiations?.[assosiations]?.attributes?.[field]
-      : this.modelFields?.[field];
+  expressValidationSchema() {
+    return this.createObjectValidation(this.modelFields, "expressValidation");
+  }
 
-    // console.log("fields", fields);
+  createObjectValidation(obj, attr) {
+    if (typeof obj !== "object") return {};
 
-    if (!fieldType) return null;
+    let acumulado = {};
 
-    // const fieldType = fields[field];
+    for (const [clave, valor] of Object.entries(obj)) {
+      if (
+        Object.hasOwnProperty.call(obj, attr) &&
+        Object.hasOwnProperty.call(obj, "id") &&
+        Object.hasOwnProperty.call(obj, "operators")
+      ) {
+        Object.keys(obj.operators).forEach((operator) => {
+          acumulado[`${obj.id}.${operator}`] = obj[attr];
+        });
+        break;
+      }
 
-    let objValidator = {};
-
-    Object.keys(fieldType.operators).forEach((operator) => {
-      objValidator = {
-        ...objValidator,
-        [paramSchema + operator]: fieldType.expressValidation,
+      acumulado = {
+        ...acumulado,
+        ...this.createObjectValidation(valor, attr),
       };
-    });
+    }
 
-    return objValidator;
+    return acumulado;
   }
 }

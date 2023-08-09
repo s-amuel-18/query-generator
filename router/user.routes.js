@@ -3,13 +3,15 @@ import { createUser, getUsers } from "../controllers/user.controller.js";
 import { check, checkSchema, query } from "express-validator";
 import { validateFields } from "../middleware/validateFields.js";
 import { userEmailExist } from "../helpers/dbUserValidator.js";
-import { userQueryBuilderValidation } from "../middleware/validations/user.validation.js";
+
+import { userQueryBuilder } from "../helpers/queryBuiler/User.queryBuilder.js";
 
 const router = Router();
+const userValidationQB = userQueryBuilder.expressValidationSchema();
 
 router.get(
   "/users",
-  [checkSchema({ ...userQueryBuilderValidation }), validateFields],
+  [checkSchema({ ...userValidationQB }), validateFields],
   // [
   //   checkSchema({ date: { trim: true, isNumeric: true, toInt: true } }),
   //   validateFields,
