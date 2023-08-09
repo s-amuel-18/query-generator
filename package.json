@@ -24,7 +24,8 @@
     "pg": "^8.11.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
-    "sequelize-paginate": "^1.1.6"
+    "sequelize-paginate": "^1.1.6",
+    "validatorjs": "^3.22.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",

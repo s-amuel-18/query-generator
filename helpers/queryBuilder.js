@@ -1,5 +1,15 @@
 import { query } from "express-validator";
 import { Op } from "sequelize";
+import validator from "validator";
+import {
+  isString,
+  isArray,
+  isArrayOrString,
+  isArrayOrNumber,
+  isNum,
+  isArrayOrDate,
+  isArrayOrInt,
+} from "../helpers/validation/funcion.validation.js";
 
 export const logicalOperators = {
   contains: (value) => ({ [Op.like]: `%${value}%` }),
@@ -33,8 +43,7 @@ export const operatorTypes = {
     expressValidation: {
       trim: true,
       optional: true,
-      isString: true,
-      errorMessage: "",
+      custom: { options: isArrayOrString },
     },
     operators: {
       begins_with,
@@ -50,7 +59,7 @@ export const operatorTypes = {
     expressValidation: {
       trim: true,
       optional: true,
-      isNumeric: true,
+      custom: { options: isArrayOrNumber },
       toInt: true,
       errorMessage: "",
     },
@@ -68,7 +77,7 @@ export const operatorTypes = {
     expressValidation: {
       trim: true,
       optional: true,
-      isDate: true,
+      custom: { options: isArrayOrDate },
       errorMessage: "",
     },
     operators: {
@@ -85,7 +94,7 @@ export const operatorTypes = {
     expressValidation: {
       trim: true,
       optional: true,
-      isNumeric: true,
+      custom: { options: isArrayOrInt },
       toInt: true,
       errorMessage: "",
     },
@@ -108,9 +117,12 @@ export const operatorTypes = {
   },
 };
 
+export let countExect = 0;
+
 export class QueryBuilder {
   constructor(modelFields) {
     this.modelFields = modelFields;
+    countExect++;
   }
 
   parserFieldsWithOperators = (paramsToFilter, fieldsWithOperators) => {
@@ -132,6 +144,8 @@ export class QueryBuilder {
           .map((operator) => {
             const valueOperator = operatorsWithFilterValue[operator];
             const operatorFn = fieldType[operator];
+            if (isArray(valueOperator))
+              return { [Op.or]: valueOperator.map((val) => operatorFn(val)) };
 
             return operatorFn(valueOperator);
           });
@@ -186,13 +200,14 @@ export class QueryBuilder {
   };
 
   expressValidationSchema() {
-    return this.createObjectValidation(this.modelFields, "expressValidation");
+    return this.createCheckSchemaObject(this.modelFields);
   }
 
-  createObjectValidation(obj, attr) {
+  createCheckSchemaObject(obj) {
     if (typeof obj !== "object") return {};
 
     let acumulado = {};
+    const attr = "expressValidation";
 
     for (const [clave, valor] of Object.entries(obj)) {
       if (
@@ -208,7 +223,7 @@ export class QueryBuilder {
 
       acumulado = {
         ...acumulado,
-        ...this.createObjectValidation(valor, attr),
+        ...this.createCheckSchemaObject(valor, attr),
       };
     }
 

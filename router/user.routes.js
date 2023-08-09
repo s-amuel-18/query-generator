@@ -12,10 +12,6 @@ const userValidationQB = userQueryBuilder.expressValidationSchema();
 router.get(
   "/users",
   [checkSchema({ ...userValidationQB }), validateFields],
-  // [
-  //   checkSchema({ date: { trim: true, isNumeric: true, toInt: true } }),
-  //   validateFields,
-  // ],
   getUsers
 );
 router.post(
