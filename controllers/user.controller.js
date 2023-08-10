@@ -10,7 +10,6 @@ export const getUsers = async (req, res) => {
   let querySelquelize;
 
   const requestParams = matchedData(req);
-
   try {
     querySelquelize = userQueryBuilder.transformRequestIntoQuery(requestParams);
   } catch (error) {
